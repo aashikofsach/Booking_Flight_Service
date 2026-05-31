@@ -10,7 +10,7 @@ const { StatusCodes } = require("http-status-codes");
 const { FLIGHT_SERVICE } = require("../config/server-config");
 
 const { Enums } = require("../utils/common");
-const { BOOKED } = Enums.BOOKING_STATUS;
+const { BOOKED, CANCELLED } = Enums.BOOKING_STATUS;
 
 async function createBooking(data) {
   const transaction = await db.sequelize.transaction();
@@ -67,6 +67,30 @@ async function makePayment(data) {
       data.bookingId,
       transaction,
     );
+    if (bookingDetails.status == CANCELLED) {
+
+    
+      throw new AppError("The Booking Was Expired ", StatusCodes.NOT_FOUND);
+    }
+    console.log(
+      "bookingDetails",
+      bookingDetails,
+      "sirf time",
+      bookingDetails.createdAt,
+      new Date(bookingDetails.createdAt),
+      new Date(),
+    );
+    const bookingTime = new Date(bookingDetails.createdAt);
+    const currentTime = new Date();
+    // if time gap is greater than 5 minutes ( 30000 ms) then :
+    if (currentTime - bookingTime > 30000) {
+       await bookingrepository.update(
+      data.bookingId,
+      { status: CANCELLED },
+      transaction,
+    );
+      throw new AppError("The Booking Was Expired ", StatusCodes.NOT_FOUND);
+    }
     if (bookingDetails.totalCost != data.totalCost) {
       throw new AppError("Payment amount not matching ", StatusCodes.NOT_FOUND);
     }
@@ -78,7 +102,7 @@ async function makePayment(data) {
     }
     // if payment is successfull
 
-    const response = await bookingrepository.update(
+    await bookingrepository.update(
       data.bookingId,
       { status: BOOKED },
       transaction,
@@ -86,7 +110,7 @@ async function makePayment(data) {
 
     await transaction.commit();
   } catch (error) {
-    console.log("veer hanumana ati", error)
+    console.log("veer hanumana ati", error);
     console.log("error catched in booking service makepayment catch");
     await transaction.rollback();
 
@@ -96,5 +120,5 @@ async function makePayment(data) {
 
 module.exports = {
   createBooking,
-  makePayment
+  makePayment,
 };
