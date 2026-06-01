@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Booking } = require("../models");
 
 const CrudRepository = require("./crud-repository");
@@ -39,6 +40,18 @@ class BookingRepository extends CrudRepository {
         StatusCodes.NOT_FOUND,
       );
     return response;
+  }
+
+  async cancelOldBooking(timestamp) {
+    const response = await this.model.findAll({
+      where: {
+        createdAt: {
+          [Op.gte]: timestamp,
+        },
+      },
+    });
+
+    return response ;
   }
 }
 

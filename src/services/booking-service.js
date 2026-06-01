@@ -10,7 +10,6 @@ const { StatusCodes } = require("http-status-codes");
 const { FLIGHT_SERVICE } = require("../config/server-config");
 
 const { Enums } = require("../utils/common");
-const { addAdminServicesToServer, status } = require("@grpc/grpc-js");
 const { BOOKED, CANCELLED } = Enums.BOOKING_STATUS;
 
 async function createBooking(data) {
@@ -83,12 +82,12 @@ async function makePayment(data) {
     const currentTime = new Date();
     // if time gap is greater than 5 minutes ( 30000 ms) then :
     if (currentTime - bookingTime > 30000) {
-      await cancelBooking(data.bookingId)
-      // *very imp : yaha yeh sahi toh lag raha hai kyuki hamne cancel kar diya 
-      // par yeh rough cancelled hua phir hamne throw kiya error jisne is update ko roll back kiya 
-      // to yeh phir initiated ban jaega 
-      // to avoid this we create a cancelbooking functiin jo pehle 
-      // seat free karega , status cancel karega and the commit karega 
+      await cancelBooking(data.bookingId);
+      // *very imp : yaha yeh sahi toh lag raha hai kyuki hamne cancel kar diya
+      // par yeh rough cancelled hua phir hamne throw kiya error jisne is update ko roll back kiya
+      // to yeh phir initiated ban jaega
+      // to avoid this we create a cancelbooking functiin jo pehle
+      // seat free karega , status cancel karega and the commit karega
       // PERFECT BEAUTY !
       // await bookingrepository.update(
       //   data.bookingId,
@@ -150,14 +149,25 @@ async function cancelBooking(bookingId) {
     );
     await transaction.commit();
   } catch (error) {
-     await transaction.rollback();
+    await transaction.rollback();
 
     throw error;
+  }
+}
+
+async function cancelOldBooking() {
+  try {
+    const time = new Date(Date.now() - 1000 * 60 *5) ;
+    const response = await bookingrepository.cancelOldBooking(time);
+    return response ;
+  } catch (error) {
+    console.log("error of booking-service cancelOldBooking")
   }
 }
 
 module.exports = {
   createBooking,
   makePayment,
-  cancelBooking
+  cancelBooking,
+  cancelOldBooking
 };
