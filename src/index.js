@@ -2,6 +2,7 @@ const {PORT} = require("./config");
 const express = require('express');
 const apiRoutes = require("./routes")
 const {ServerConfig , logger} = require("./config");
+const {CRONS} = require("./utils/common")
 
 const app = express() ;
 
@@ -13,6 +14,7 @@ app.use("/api", apiRoutes)
 
 app.listen(ServerConfig.PORT , () => {
     console.log(`The server is running on the PORT: ${ServerConfig.PORT}`) ;
+    CRONS();
    
 })
 

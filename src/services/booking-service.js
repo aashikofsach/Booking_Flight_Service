@@ -83,7 +83,7 @@ async function makePayment(data) {
     const currentTime = new Date();
     // if time gap is greater than 5 minutes ( 30000 ms) then :
     if (currentTime - bookingTime > 30000) {
-      cancelBooking(data.bookingId)
+      await cancelBooking(data.bookingId)
       // *very imp : yaha yeh sahi toh lag raha hai kyuki hamne cancel kar diya 
       // par yeh rough cancelled hua phir hamne throw kiya error jisne is update ko roll back kiya 
       // to yeh phir initiated ban jaega 
