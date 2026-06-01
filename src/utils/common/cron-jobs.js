@@ -7,8 +7,8 @@ function schedule() {
   //     console.log("running a task every minute");
   //   });
 
-  console.log("value of Bookinng Service", BookingService)
-  cron.schedule("*/5 * * * * *", async() => {
+//   console.log("value of Bookinng Service", BookingService)
+  cron.schedule("*/30 * * * *", async() => {
     //     console.log("running a task every minute");
     //   });
 
