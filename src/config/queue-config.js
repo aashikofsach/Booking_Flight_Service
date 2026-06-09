@@ -19,10 +19,12 @@ async function queueConnection() {
   }
 }
 
-async function sendData(data) {
+ function sendData(data) {
   try {
     // in generally the data comes as object so we have to stringify it 
-    await channel.sendToQueue("noti-queue", Buffer.from(JSON.stringify(data)));
+    // we remove the await as channel.sendToQueue only return true or false 
+
+     channel.sendToQueue("noti-queue", Buffer.from(JSON.stringify(data)));
   } catch (error) {
     console.log("error from when sending data to queue ", error);
   }

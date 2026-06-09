@@ -120,8 +120,6 @@ async function makePayment(data) {
       text : `Booking Successfully done for the Booking Id ${data.bookingId}`,
       subject : "Flight booked",
       recepientEmail : "ritikkamboj4314@gmail.com"
-
-
     });
 
   } catch (error) {
