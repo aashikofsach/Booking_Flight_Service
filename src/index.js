@@ -10,13 +10,13 @@ async function queueConnection()
 
         await channel.assertQueue("noti-queue");
         // setInterval(() => {
-        //              channel.sendToQueue("noti-queue", Buffer.from("Something to do "))
+                     await channel.sendToQueue("noti-queue", Buffer.from("Something to do naya lifafa jai harayna"))
 
             
         // }, 1000);
         
     } catch (error) {
-        console.log('errror during connection to rabbit MQ', error);
+        console.log('errror during connection to rabbit MQ from booking service', error);
         
     }
 }
