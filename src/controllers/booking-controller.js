@@ -25,7 +25,7 @@ async function createBooking(req, res) {
     return res.status(StatusCodes.CREATED).json(SuccessResponse);
   } catch (error) {
     ErrorResponse.error = error;
-    return res.status(error.statusCode).json(ErrorResponse);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse);
   }
 }
 
@@ -63,7 +63,7 @@ async function makePayment(req, res) {
     console.log("jaadu", error);
     ErrorResponse.error = error;
     console.log("veer hanumana");
-    return res.status(error.statusCode).json(ErrorResponse);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse);
   }
 }
 

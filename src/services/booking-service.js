@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 const { BookingRepository } = require("../repositories");
-const { ServerConfig } = require("../config");
+const { ServerConfig, queue } = require("../config");
 
 const bookingrepository = new BookingRepository();
 const db = require("../models");
@@ -11,7 +11,6 @@ const { FLIGHT_SERVICE } = require("../config/server-config");
 
 const { Enums } = require("../utils/common");
 const { BOOKED, CANCELLED } = Enums.BOOKING_STATUS;
-
 
 async function createBooking(data) {
   const transaction = await db.sequelize.transaction();
@@ -52,6 +51,8 @@ async function createBooking(data) {
     );
 
     await transaction.commit();
+    // here once the booking created successfully then we can produce the the event to message queue
+   
     return booking;
   } catch (error) {
     console.log("error catched in booking service createBooking catch");
@@ -62,7 +63,6 @@ async function createBooking(data) {
 }
 
 async function makePayment(data) {
- 
   const transaction = await db.sequelize.transaction();
   try {
     const bookingDetails = await bookingrepository.get(
@@ -116,6 +116,14 @@ async function makePayment(data) {
     );
 
     await transaction.commit();
+      queue.sendData({
+      text : `Booking Successfully done for the Booking Id ${data.bookingId}`,
+      subject : "Flight booked",
+      recepientEmail : "ritikkamboj4314@gmail.com"
+
+
+    });
+
   } catch (error) {
     console.log("veer hanumana ati", error);
     console.log("error catched in booking service makepayment catch");
